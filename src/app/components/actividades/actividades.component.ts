@@ -9,9 +9,6 @@ import { Actividades } from '../../models/actividades';
 import { Task } from '../../models/tasks';
 import { Empleado } from './../../models/empleado';
 import { EmpleadoService } from '../../services/empleado.service';
-import { CookieService } from 'ngx-cookie-service';
-import { Router } from '@angular/router';
-import * as jwtDecode from 'jwt-decode';
 
 @Component({
   selector: 'app-actividades',
@@ -24,17 +21,10 @@ export class ActividadesComponent implements OnInit {
   empleados: any[] = [];
   actividadesForm: FormGroup;
   nombreBusqueda: string = '';
-  token?: string;
-  cookie?: boolean;
-  tokenDecodificado: any;
-  navBarAdmin: boolean = false;
-  navBarEmpleado: boolean = false;
-  navBarSuper: boolean = false;
-  navbarLogin: boolean = true;
   private taskIdCounter: number = 1;
 
   constructor(private actividadesService: ActividadesService, private taskService: TaskService,private empleadoService: EmpleadoService,
-              private fb: FormBuilder, private cookieService: CookieService,private router: Router) {
+              private fb: FormBuilder) {
     this.actividadesForm = this.fb.group({
       NombreActividad: [''],
       Fecha: [''],
@@ -46,20 +36,6 @@ export class ActividadesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.token = this.cookieService.get('token');
-    this.cookie = this.cookieService.check('token');
-
-    if (!this.cookie || !this.token) {
-      this.router.navigate(['login']);
-      this.navbarLogin = true;
-      return;
-    }
-
-    this.tokenDecodificado = jwtDecode.jwtDecode(this.token);
-
-    this.determinarBarraDeNavegacion();
-
-    
     this.cargarActividades();
     this.getEmpleados();
   }
@@ -257,19 +233,7 @@ guardarActividad(): void {
     );
   }
 
-  determinarBarraDeNavegacion(): void {
-    switch (this.tokenDecodificado.Role) {
-      case 'Superadministrador':
-        this.navBarSuper = true;
-        break;
-      case 'Administrador':
-        this.navBarAdmin = true;
-        break;
-      case 'Empleado':
-        this.navBarEmpleado = true;
-        break;
-    }
-    this.navbarLogin = false;
-  }
+
+
 
 }
